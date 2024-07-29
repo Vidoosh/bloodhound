@@ -2,14 +2,8 @@ analyze_health_report:
   description: >
     Analyze the provided blood test report and identify key health indicators.
     Summarize the findings in a clear and concise manner.
-    Ensure to capture the patient's ...
-
-
-    PDF file: {path_to_pdf}
   expected_output: >
     A structured summary of key health indicators from the blood test report (in json).
-  agent: >
-    analyzer
 
 find_relevant_articles:
   description: >
@@ -18,8 +12,6 @@ find_relevant_articles:
     Give a relevancy score based on the relevancy of an article (1 being the least relevant and 10 being the most) according to the person's needs.
   expected_output: >
     A structured summary of relevant health articles along with their links and relevancy score (in json).
-  agent: >
-    researcher
     
 filter_articles:
   description: >
@@ -34,8 +26,6 @@ filter_articles:
     Multiply the final credibility score of an article to its relevancy score to get the priority of the article.
   expected_output: >
     Return a json that was recieved from the researcher along with a credibility score and priority assigned to each article. 
-  agent: >
-    filter
 
 health_recommendations:
   description: >
@@ -43,6 +33,4 @@ health_recommendations:
     Ensure the recommendations are practical and evidence-based. 
     Use the priority score (1 being the least priority and 100 being the most) to determine the relevancy and credibility of an article.
   expected_output: >
-
-  agent: >
-    advisor
+    A professional and descriptive summary from the research findings.

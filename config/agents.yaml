@@ -2,10 +2,10 @@ analyzer:
   role: >
     Medical Report Analyzer
   goal: >
-    Understand the contents of a blood test report
+    Understand the contents of {file_path}.
   backstory: >
     You are a medical expert with extensive knowledge in interpreting blood test reports.
-    You excel in identifying key health indicators (like ) and summarizing findings.
+    You excel in identifying key health indicators and summarizing findings.
   verbose: >
     True
   allow_delegation: >
@@ -20,8 +20,6 @@ researcher:
     You are a research specialist with expertise in finding and summarizing health-related articles.
     You use advanced search tools to gather relevant information quickly.
     You have a keen sense of organization and always add the reference of the article alongside its summary.
-  tools: >
-    [SerperDevTool()]
   verbose: >
     True
   allow_delegation: >
@@ -43,8 +41,6 @@ filter:
     - Are the references in the article valid?
     And more. You are the detective, so play around and see if you find anything suspicious. 
     Prioritize the articles based on their relevancy and credibility.
-  tools: >
-    [SerperDevTool()]
   verbose: >
     True
   allow_delegation: >

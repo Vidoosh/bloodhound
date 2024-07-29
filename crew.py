@@ -1,7 +1,9 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-
-from crewai_tools import CSVSearchTool, FileReadTool
+import os
+from crewai_tools import FileReadTool, SerperDevTool, WebsiteSearchTool, DirectoryReadTool
+import openai
+import logging
 
 
 @CrewBase
@@ -10,49 +12,74 @@ class BloodHoundCrew:
 
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
+    file_tool = FileReadTool()
+    search_tool = SerperDevTool()
+    web_rag_tool = WebsiteSearchTool()
 
     @agent
-    def pdf_reader(self) -> Agent:
+    def analyzer(self, file_path="./data/sample_blood_report.pdf") -> Agent:
         return Agent(
-            config=self.agents_config["pdf_reader"],
-            tools=[FileReadTool()],
+            config=self.agents_config["analyzer"],
+            tools=[self.file_tool],
             verbose=True,
             allow_delegation=False,
         )
 
     @agent
-    def health_article_crawler(self) -> Agent:
+    def researcher(self) -> Agent:
         return Agent(
-            config=self.agents_config["health_article_crawler"],
-            tools=[],
+            config=self.agents_config["researcher"],
+            tools=[self.search_tool, self.web_rag_tool],
+            verbose=True,
+            allow_delegation=False,
+            # llm=self.llm
+        )
+    
+    @agent
+    def filter(self) -> Agent:
+        return Agent(
+            config=self.agents_config["filter"],
+            tools=[self.search_tool, self.web_rag_tool],
             verbose=True,
             allow_delegation=False,
         )
 
     @agent
-    def health_recommender(self) -> Agent:
+    def advisor(self) -> Agent:
         return Agent(
-            config=self.agents_config["health_recommender"],
+            config=self.agents_config["advisor"],
             tools=[],
             verbose=True,
             allow_delegation=False,
         )
 
     @task
-    def read_pdf_task(self) -> Task:
-        return Task(config=self.tasks_config["read_pdf_task"], agent=self.cv_reader())
+    def analyze_health_report(self) -> Task:
+        print("analyzing...")
+        return Task(config=self.tasks_config["analyze_health_report"], agent=self.analyzer)
 
     @task
-    def match_cv_task(self) -> Task:
-        return Task(config=self.tasks_config["match_cv_task"], agent=self.matcher())
+    def find_relevant_articles(self) -> Task:
+        print("searching...")
+        return Task(config=self.tasks_config["find_relevant_articles"], agent=self.researcher)
+
+    @task
+    def find_relevant_articles(self) -> Task:
+        print("filtering...")
+        return Task(config=self.tasks_config["filter_articles"], agent=self.filter)
+    
+    @task
+    def find_relevant_articles(self) -> Task:
+        print("advicing...")
+        return Task(config=self.tasks_config["health_recommendations"], agent=self.advisor)
 
     @crew
     def crew(self) -> Crew:
         """Creates the BloodHound crew"""
         return Crew(
-            agents=self.agents,  # Automatically created by the @agent decorator
-            tasks=self.tasks,  # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=2,
-            # process=Process.hierarchical, # In case you want to use that instead https://docs.crewai.com/how-to/Hierarchical/
+            full_output=True
         )
